@@ -7,7 +7,7 @@ export type TailwindPluginOptions = {
   /**
    * The prefix to use for Tailwind CSS classes.
    * This helps differentiate Tailwind classes from other CSS classes.
-   * @default tw
+   * @default "tw"
    */
   prefix?: string;
   /**
@@ -16,24 +16,31 @@ export type TailwindPluginOptions = {
    * @default true
    */
   autobuild?: boolean;
-
+  /**
+   * This option allows you to append your own Tailwind CSS code immediately after the "@import 'tailwindcss';" statement.
+   * This means you can add any custom directives, such as "@layer components { ... }" or even "@theme { ... }"
+   * to further extend or override the default styles.
+   *
+   * @see https://tailwindcss.com/docs/theme for more detailes on how customize theme variables.
+   * @see https://tailwindcss.com/docs/adding-custom-styles for more details on how to customize your Tailwind CSS.
+   * @default null
+   */
+  customCss?: string | null;
   /**
    * Option to add a build button to the toolbar.
    * When set to true, a button will be added that allows manual triggering of the Tailwind CSS build process.
    * @default false
    */
   buildButton?: boolean;
-
   /**
    * Specifies which panel the build button should be added to
-   * @default options
+   * @default "options"
    */
   toolbarPanel?: string;
-
   /**
    * Define a custom function to handle notifications when the Tailwind CSS is compiled
    * with the `build-tailwind` command
-   * @default window.alert
+   * @default () => void
    */
   notificationCallback?: () => void;
 };
@@ -44,9 +51,10 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
     ...{
       i18n: {},
       // default options
-      prefix: "tw",
       autobuild: true,
       buildButton: false,
+      customCss: null,
+      prefix: "tw",
       toolbarPanel: "options",
       notificationCallback: () => {},
     },
@@ -89,7 +97,9 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
   // Build the Tailwind CSS compiler using tailwindcss.compile with a custom stylesheet loader
   const buildCompiler = async () => {
     compiler = await tailwindcss.compile(
-      `@import "tailwindcss" prefix(${options.prefix});`,
+      `@import "tailwindcss" prefix(${options.prefix});${
+        options.customCss ?? ""
+      }`,
       {
         base: "/",
         loadStylesheet,
