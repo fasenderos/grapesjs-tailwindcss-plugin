@@ -1,7 +1,7 @@
 {
   "name": "grapesjs-tailwindcss-plugin",
-  "version": "1.0.0",
-  "description": "Grapesjs Tailwindcss Plugin",
+  "version": "0.0.0",
+  "description": "A powerful GrapesJS plugin that integrates Tailwind CSS 4 for modern styling and rapid development",
   "main": "dist/index.js",
   "repository": {
     "type": "git",
@@ -14,10 +14,9 @@
     "release": "node --env-file=.env ./node_modules/release-it/bin/release-it.js --ci",
     "start": "grapesjs-cli serve"
   },
-  "keywords": [
-    "grapesjs",
-    "plugin"
-  ],
+  "dependencies": {
+    "tailwindcss": "^4.0.12"
+  },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
     "@release-it/conventional-changelog": "^10.0.0",
@@ -28,10 +27,21 @@
     "tsx": "^4.19.2"
   },
   "license": "MIT",
-  "dependencies": {
-    "@tailwindcss/browser": "^4.0.12",
-    "@tailwindcss/postcss": "^4.0.12",
-    "postcss": "^8.5.3",
-    "tailwindcss": "^4.0.12"
-  }
+  "keywords": [
+    "grapesjs-plugin-tailwind",
+    "grapesjs-plugin-tailwindcss",
+    "grapesjs-plugin",
+    "tailwindcss",
+    "tailwindcss4",
+    "grapesjs"
+  ],
+  "files": [
+    "dist",
+    "locale",
+    "AUTHORS",
+    "CHANGELOG.md",
+    "LICENSE",
+    "README.md",
+    "package.json"
+  ]
 }
