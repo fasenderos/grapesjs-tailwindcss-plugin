@@ -44,11 +44,11 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
     ...{
       i18n: {},
       // default options
-      prefix: "tw", // default prefix for Tailwind classes
+      prefix: "tw",
       autobuild: true,
       buildButton: false,
       toolbarPanel: "options",
-      notificationCallback: () => alert("Tailwind CSS compiled successfully"),
+      notificationCallback: () => {},
     },
     ...opts,
   };

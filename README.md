@@ -1,77 +1,46 @@
-# Grapesjs Tailwindcss Plugin
+# GrapesJS TailwindCSS Plugin
 
-[DEMO](##)
-> **Provide a live demo of your plugin**
-For a better user engagement create a simple live demo by using services like [JSFiddle](https://jsfiddle.net) [CodeSandbox](https://codesandbox.io) [CodePen](https://codepen.io) and link it here in your README (attaching a screenshot/gif will also be a plus).
-To help you in this process here below you will find the necessary HTML/CSS/JS, so it just a matter of copy-pasting on some of those services. After that delete this part and update the link above
+A powerful GrapesJS plugin that integrates **Tailwind CSS 4** for modern styling and rapid development. Unlike other plugins that are stuck on Tailwind 3, this plugin dynamically builds the Tailwind CSS on-the-fly and makes it available in the export, ensuring you have access to the latest Tailwind features and utilities.
 
-### HTML
+## Overview
+
+The **GrapesJS TailwindCSS Plugin** seamlessly integrates Tailwind CSS 4 with GrapesJS, enabling you to leverage a modern CSS framework directly within your page builder. With on-the-fly CSS building, this plugin provides up-to-date styles and exports the compiled CSS with your project.
+
+**Key Features:**
+
+- **Tailwind CSS 4 Integration:** Utilize the latest version of Tailwind CSS.
+- **Dynamic CSS Build:** Automatically compiles Tailwind CSS based on your project's classes.
+- **Export Ready:** The compiled CSS is appended to your export, ensuring consistency.
+
+## Installation
+
+### CDN
+
 ```html
-<link href="https://unpkg.com/grapesjs/dist/css/grapes.min.css" rel="stylesheet">
-<script src="https://unpkg.com/grapesjs"></script>
 <script src="https://unpkg.com/grapesjs-tailwindcss-plugin"></script>
-
-<div id="gjs"></div>
 ```
 
-### JS
-```js
-const editor = grapesjs.init({
-	container: '#gjs',
-  height: '100%',
-  fromElement: true,
-  storageManager: false,
-  plugins: ['grapesjs-tailwindcss-plugin'],
-});
+### NPM
+
+```sh
+npm i grapesjs-tailwindcss-plugin
 ```
 
-### CSS
-```css
-body, html {
-  margin: 0;
-  height: 100%;
-}
+### GIT
+
+```sh
+git clone https://github.com/fasenderos/grapesjs-tailwindcss-plugin.git
 ```
-
-
-## Summary
-
-* Plugin name: `grapesjs-tailwindcss-plugin`
-* Components
-    * `component-id-1`
-    * `component-id-2`
-    * ...
-* Blocks
-    * `block-id-1`
-    * `block-id-2`
-    * ...
-
-
-
-## Options
-
-| Option | Description | Default |
-|-|-|-
-| `option1` | Description option | `default value` |
-
-
-
-## Download
-
-* CDN
-  * `https://unpkg.com/grapesjs-tailwindcss-plugin`
-* NPM
-  * `npm i grapesjs-tailwindcss-plugin`
-* GIT
-  * `git clone https://github.com/fasenderos/grapesjs-tailwindcss-plugin.git`
-
-
 
 ## Usage
 
-Directly in the browser
+### Directly in the Browser
+
 ```html
-<link href="https://unpkg.com/grapesjs/dist/css/grapes.min.css" rel="stylesheet"/>
+<link
+  href="https://unpkg.com/grapesjs/dist/css/grapes.min.css"
+  rel="stylesheet"
+/>
 <script src="https://unpkg.com/grapesjs"></script>
 <script src="path/to/grapesjs-tailwindcss-plugin.min.js"></script>
 
@@ -79,37 +48,56 @@ Directly in the browser
 
 <script type="text/javascript">
   var editor = grapesjs.init({
-      container: '#gjs',
-      // ...
-      plugins: ['grapesjs-tailwindcss-plugin'],
-      pluginsOpts: {
-        'grapesjs-tailwindcss-plugin': { /* options */ }
-      }
+    container: "#gjs",
+    // ... other configurations
+    plugins: ["grapesjs-tailwindcss-plugin"],
+    pluginsOpts: {
+      "grapesjs-tailwindcss-plugin": {
+        // Options like autobuild, toolbarPanel, notificationCallback, buildButton, etc.
+      },
+    },
   });
 </script>
 ```
 
-Modern javascript
+### Modern Javascript
+
 ```js
-import grapesjs from 'grapesjs';
-import plugin from 'grapesjs-tailwindcss-plugin';
-import 'grapesjs/dist/css/grapes.min.css';
+import grapesjs from "grapesjs";
+import plugin from "grapesjs-tailwindcss-plugin";
+import "grapesjs/dist/css/grapes.min.css";
 
 const editor = grapesjs.init({
-  container : '#gjs',
-  // ...
+  container: "#gjs",
+  // ... other configurations
   plugins: [plugin],
   pluginsOpts: {
-    [plugin]: { /* options */ }
-  }
-  // or
-  plugins: [
-    editor => plugin(editor, { /* options */ }),
-  ],
+    [plugin]: {
+      // Options like autobuild, toolbarPanel, notificationCallback, buildButton, etc.
+    },
+  },
+  // Alternatively:
+  // plugins: [
+  //   editor => plugin(editor, { /* options */ }),
+  // ],
 });
 ```
 
+## Summary
 
+- Plugin name: `grapesjs-tailwindcss-plugin`
+- Commands: `build-tailwind`
+- Button: `build-tailwind-button`
+
+## Options
+
+| Option                 | Description                                                                                               | Default      |
+| ---------------------- | --------------------------------------------------------------------------------------------------------- | ------------ |
+| `prefix`               | Prefix to use for Tailwind CSS classes. Helps differentiate Tailwind classes from others.                 | `tw`         |
+| `autobuild`            | If `true`, the plugin automatically rebuilds Tailwind CSS on each update. Set to false for manual builds. | `true`       |
+| `buildButton`          | Option to add a manual build button to the toolbar for triggering the CSS build process.                  | `false`      |
+| `toolbarPanel`         | Specify the panel where the build button should be added (e.g., `options`).                               | `options`    |
+| `notificationCallback` | A custom callback function to handle notifications when Tailwind CSS is compiled.                         | `() => void` |
 
 ## Development
 
@@ -138,8 +126,6 @@ Build the source
 $ npm run build
 ```
 
-
-
 ## License
 
-MIT
+Copyright [Andrea Fassina](https://github.com/fasenderos), Licensed under [MIT](LICENSE).

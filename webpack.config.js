@@ -1,13 +1,6 @@
-// const NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
-const path = require("node:path");
-
 module.exports = ({ config }) => {
   return {
     ...config,
-    resolve: {
-      extensions: [...[".mjs"], ...config.resolve.extensions],
-      ...config.resolve,
-    },
     module: {
       rules: [
         {
@@ -15,9 +8,9 @@ module.exports = ({ config }) => {
           use: [
             {
               loader: "css-loader",
-              options: { exportType: "string" } // 🔥 Ritorna direttamente una stringa
-            }
-          ]
+              options: { exportType: "string" },
+            },
+          ],
         },
         ...config.module.rules,
       ],
