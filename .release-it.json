@@ -1,0 +1,42 @@
+{
+  "git": {
+    "commitMessage": "chore(release): grapesjs-chartjs-plugin@${version}",
+    "tagName": "v${version}",
+    "tagAnnotation": "Release v${version}",
+    "requireCommits": true,
+    "requireCleanWorkingDir": true
+  },
+  "github": {
+    "release": true,
+    "releaseName": "v${version}",
+    "commitArgs": ["-S"],
+    "tagArgs": ["-s"]
+  },
+  "npm": {
+    "publish": true,
+    "access": "public"
+  },
+  "plugins": {
+    "@release-it/conventional-changelog": {
+      "header": "# Changelog",
+      "infile": "CHANGELOG.md",
+      "preset": {
+        "name": "conventionalcommits",
+        "types": [
+          { "type": "feat", "section": "Features" },
+          { "type": "fix", "section": "Bug Fixes" },
+          { "type": "chore", "hidden": true },
+          { "type": "docs", "hidden": true },
+          { "type": "refactor", "hidden": true },
+          { "type": "perf", "hidden": true },
+          { "type": "test", "hidden": true },
+          { "type": "style", "hidden": true }
+        ]
+      }
+    }
+  },
+  "hooks": {
+    "before:init": "npm run lint",
+    "after:bump": "npm run build"
+  }
+}
