@@ -67,13 +67,13 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
   let compiler: Awaited<ReturnType<typeof tailwindcss.compile>>;
 
   /** Reference to the <style> element where generated Tailwind CSS is injected */
-  let tailwindStyle: HTMLStyleElement;
+  let tailwindStyle: HTMLStyleElement | undefined;
 
   // Override the editor's getCss method to append the generated Tailwind CSS
   const originalGetCss = editor.getCss.bind(editor);
   editor.getCss = () => {
     const originalCss = originalGetCss();
-    return `${originalCss}\n${tailwindStyle.textContent}`;
+    return `${originalCss}\n${tailwindStyle?.textContent ?? ""}`;
   };
 
   // Cache to store processed Tailwind classes to avoid unnecessary recompilation
@@ -82,7 +82,7 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
   const setTailwindStyleElement = () => {
     const iframe = editor.Canvas.getDocument();
     const wrapper = iframe.querySelector(
-      '[data-gjs-type="wrapper"]',
+      '[data-gjs-type="wrapper"]'
     ) as HTMLDivElement;
     if (wrapper) {
       tailwindStyle = iframe.getElementById(STYLE_ID) as HTMLStyleElement;
@@ -103,7 +103,7 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
       {
         base: "/",
         loadStylesheet,
-      },
+      }
     );
   };
 
@@ -190,12 +190,15 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
       if (classesCache.size) {
         tailwindCss += await compiler.build(Array.from(classesCache));
       }
-      tailwindStyle.textContent = tailwindCss;
+      if (tailwindStyle !== undefined) tailwindStyle.textContent = tailwindCss;
     } catch (error) {
       console.error("Error building Tailwind CSS:", error);
     }
     return;
   };
+
+  // Build the Tailwind CSS on initial HTML load
+  editor.on("load", buildTailwindCss);
 
   // If autobuild option is true, listen to the editor's update events to trigger Tailwind CSS rebuilds.
   if (options.autobuild) {
