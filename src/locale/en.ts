@@ -1,5 +1,5 @@
 export default {
-    'grapesjs-tailwindcss-plugin': {
-        // 'key': 'value',
-    },
+  "grapesjs-tailwindcss-plugin": {
+    // 'key': 'value',
+  },
 };

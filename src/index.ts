@@ -1,7 +1,7 @@
-import * as assets from "./assets";
+import type { Editor } from "grapesjs";
 // @ts-ignore
 import * as tailwindcss from "tailwindcss";
-import type { Editor } from "grapesjs";
+import * as assets from "./assets";
 
 export type TailwindPluginOptions = {
   /**
@@ -74,7 +74,7 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
   const setTailwindStyleElement = () => {
     const iframe = editor.Canvas.getDocument();
     const wrapper = iframe.querySelector(
-      '[data-gjs-type="wrapper"]'
+      '[data-gjs-type="wrapper"]',
     ) as HTMLDivElement;
     if (wrapper) {
       tailwindStyle = iframe.getElementById(STYLE_ID) as HTMLStyleElement;
@@ -93,7 +93,7 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
       {
         base: "/",
         loadStylesheet,
-      }
+      },
     );
   };
 
