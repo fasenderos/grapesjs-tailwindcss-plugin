@@ -2,6 +2,12 @@
 
 A powerful GrapesJS plugin that integrates **Tailwind CSS 4** for modern styling and rapid development. Unlike other plugins that are stuck on Tailwind 3, this plugin dynamically builds the Tailwind CSS on-the-fly and makes it available in the export, ensuring you have access to the latest Tailwind features and utilities.
 
+[DEMO](https://codesandbox.io/p/sandbox/grapesjs-tailwindcss-4-plugin-demo-d24p68)
+
+<p align="center">
+:star: Star me on GitHub — it motivates me a lot!
+</p>
+
 ## Overview
 
 The **GrapesJS TailwindCSS Plugin** seamlessly integrates Tailwind CSS 4 with GrapesJS, enabling you to leverage a modern CSS framework directly within your page builder. With on-the-fly CSS building, this plugin provides up-to-date styles and exports the compiled CSS with your project.
