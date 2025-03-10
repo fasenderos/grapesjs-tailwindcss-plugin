@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.4](https://github.com/fasenderos/grapesjs-tailwindcss-plugin/compare/v0.1.3...v0.1.4) (2025-03-10)
+
+### Bug Fixes
+
+* check whole html for changes ([d8fb4b5](https://github.com/fasenderos/grapesjs-tailwindcss-plugin/commit/d8fb4b54bfa831cee7cd4e681e3d43c7c561f405))
+
 ## [0.1.3](https://github.com/fasenderos/grapesjs-tailwindcss-plugin/compare/v0.1.2...v0.1.3) (2025-03-10)
 
 ## [0.1.2](https://github.com/fasenderos/grapesjs-tailwindcss-plugin/compare/v0.1.1...v0.1.2) (2025-03-10)
