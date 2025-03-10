@@ -97,7 +97,7 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
   const setTailwindStyleElement = () => {
     const iframe = editor.Canvas.getDocument();
     const wrapper = iframe.querySelector(
-      '[data-gjs-type="wrapper"]'
+      '[data-gjs-type="wrapper"]',
     ) as HTMLDivElement;
     if (wrapper) {
       tailwindStyle = iframe.getElementById(STYLE_ID) as HTMLStyleElement;
@@ -129,14 +129,14 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
 
   // Fired by grapesjs-preset-webpage on import close
   editor.on("command:stop:gjs-open-import-webpage", () =>
-    runWorker(editor.getHtml())
+    runWorker(editor.getHtml()),
   );
 
   // If autobuild option is true, listen to the editor's update events to trigger Tailwind CSS rebuilds.
   if (options.autobuild) {
     // Listen to the editor's update events to trigger Tailwind CSS rebuilds
     editor.on("component:update:classes", (cmp: Component) =>
-      runWorker(cmp.toHTML())
+      runWorker(cmp.toHTML()),
     );
   }
 

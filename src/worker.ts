@@ -30,7 +30,7 @@ const buildCompiler = async (prefix: string, customCss: string | null) => {
     {
       base: "/",
       loadStylesheet,
-    }
+    },
   );
 };
 
@@ -54,7 +54,7 @@ async function loadStylesheet(id: string, base: string) {
 // Initialize the Tailwind compiler, clear the classes cache, and set up the style element
 const initTailwindCompiler = async (
   prefix: string,
-  customCss: string | null
+  customCss: string | null,
 ) => {
   await buildCompiler(prefix, customCss);
   classesCache.clear();
@@ -82,7 +82,7 @@ const getClassesFromHtml = (html: string, prefix: string) => {
 const processRemovedClasses = async (
   currentClasses: Set<string>,
   prefix: string,
-  customCss: string | null
+  customCss: string | null,
 ) => {
   // Identify classes that have been removed
   let changed = false;
@@ -141,7 +141,7 @@ self.onmessage = async (event: MessageEvent<WorkerMessageData>) => {
     const classesRemoved = await processRemovedClasses(
       currentClasses,
       prefix,
-      customCss
+      customCss,
     );
 
     // Identify new classes to add
