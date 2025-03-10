@@ -5,7 +5,7 @@ import * as assets from "./assets";
 export type WorkerMessageData = {
   html: string;
   prefix: string;
-  customCss: string | null;
+  customCss?: string;
   notify: boolean;
 };
 
@@ -24,7 +24,7 @@ let compiler: Awaited<ReturnType<typeof tailwindcss.compile>>;
 const classesCache = new Set<string>();
 
 // Build the Tailwind CSS compiler using tailwindcss.compile with a custom stylesheet loader
-const buildCompiler = async (prefix: string, customCss: string | null) => {
+const buildCompiler = async (prefix: string, customCss?: string) => {
   compiler = await tailwindcss.compile(
     `@import "tailwindcss" prefix(${prefix});${customCss ?? ""}`,
     {
@@ -52,10 +52,7 @@ async function loadStylesheet(id: string, base: string) {
 }
 
 // Initialize the Tailwind compiler, clear the classes cache, and set up the style element
-const initTailwindCompiler = async (
-  prefix: string,
-  customCss: string | null,
-) => {
+const initTailwindCompiler = async (prefix: string, customCss?: string) => {
   await buildCompiler(prefix, customCss);
   classesCache.clear();
 };
@@ -82,7 +79,7 @@ const getClassesFromHtml = (html: string, prefix: string) => {
 const processRemovedClasses = async (
   currentClasses: Set<string>,
   prefix: string,
-  customCss: string | null,
+  customCss?: string,
 ) => {
   // Identify classes that have been removed
   let changed = false;
@@ -118,7 +115,7 @@ const processAddedClasses = (currentClasses: Set<string>): boolean => {
   return changed;
 };
 
-const compileTailwindCss = async (prefix: string, customCss: string | null) => {
+const compileTailwindCss = async () => {
   // Build Tailwind CSS if there are classes in the cache
   if (classesCache.size > 0) {
     return compiler.build(Array.from(classesCache)) as string;
@@ -153,7 +150,7 @@ self.onmessage = async (event: MessageEvent<WorkerMessageData>) => {
       result.data = { tailwindcss: null, notify };
     } else {
       result.data = {
-        tailwindcss: await compileTailwindCss(prefix, customCss),
+        tailwindcss: await compileTailwindCss(),
         notify,
       };
     }

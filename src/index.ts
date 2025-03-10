@@ -26,7 +26,7 @@ export type TailwindPluginOptions = {
    * @see https://tailwindcss.com/docs/adding-custom-styles for more details on how to customize your Tailwind CSS.
    * @default null
    */
-  customCss?: string | null;
+  customCss?: string;
   /**
    * Option to add a build button to the toolbar.
    * When set to true, a button will be added that allows manual triggering of the Tailwind CSS build process.
@@ -54,7 +54,7 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
       // default options
       autobuild: true,
       buildButton: false,
-      customCss: null,
+      customCss: "",
       prefix: "tw",
       toolbarPanel: "options",
       notificationCallback: () => {},
