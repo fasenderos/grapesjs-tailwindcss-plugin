@@ -2,7 +2,7 @@
 import * as tailwindcss from "tailwindcss";
 import * as assets from "./assets";
 
-import type { Component, Editor } from "grapesjs";
+import type { Editor } from "grapesjs";
 
 export type TailwindPluginOptions = {
   /**
@@ -239,8 +239,8 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
   // If autobuild option is true, listen to the editor's update events to trigger Tailwind CSS rebuilds.
   if (options.autobuild) {
     // Listen to the editor's update events to trigger Tailwind CSS rebuilds
-    editor.on("component:update:classes", (cmp: Component) =>
-      buildTailwindCss(cmp.toHTML()),
+    editor.on("component:update:classes", () =>
+      buildTailwindCss(editor.getHtml()),
     );
   }
 
