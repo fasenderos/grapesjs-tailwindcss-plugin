@@ -1,7 +1,8 @@
-import type { Editor } from "grapesjs";
+import type { Component, Editor } from "grapesjs";
 // @ts-ignore
 import * as tailwindcss from "tailwindcss";
 import * as assets from "./assets";
+import type { WorkerMessageData, WorkerResponse } from "./worker";
 
 export type TailwindPluginOptions = {
   /**
@@ -63,8 +64,10 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
 
   const STYLE_ID = "tailwindcss-plugin";
 
-  /** Tailwind CSS compiler instance */
-  let compiler: Awaited<ReturnType<typeof tailwindcss.compile>>;
+  // Create worker to elaborate big html structure in chunk
+  const worker = new Worker(new URL("./worker.ts", import.meta.url), {
+    type: "module",
+  });
 
   /** Reference to the <style> element where generated Tailwind CSS is injected */
   let tailwindStyle: HTMLStyleElement | undefined;
@@ -76,13 +79,25 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
     return `${originalCss}\n${tailwindStyle?.textContent ?? ""}`;
   };
 
-  // Cache to store processed Tailwind classes to avoid unnecessary recompilation
-  const classesCache = new Set<string>();
+  // Worker response handler. Here we receive the compiled tailwind css
+  worker.onmessage = async (event: MessageEvent<WorkerResponse>) => {
+    const { data } = event.data;
+    if (data) {
+      const { tailwindcss, notify } = data;
+      // Append the compiled tailwind css to the tailwind style element
+      if (typeof tailwindcss === "string" && tailwindStyle !== undefined) {
+        tailwindStyle.textContent = tailwindcss;
+      }
+      if (notify) {
+        options.notificationCallback();
+      }
+    }
+  };
 
   const setTailwindStyleElement = () => {
     const iframe = editor.Canvas.getDocument();
     const wrapper = iframe.querySelector(
-      '[data-gjs-type="wrapper"]',
+      '[data-gjs-type="wrapper"]'
     ) as HTMLDivElement;
     if (wrapper) {
       tailwindStyle = iframe.getElementById(STYLE_ID) as HTMLStyleElement;
@@ -94,126 +109,41 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
     }
   };
 
-  // Build the Tailwind CSS compiler using tailwindcss.compile with a custom stylesheet loader
-  const buildCompiler = async () => {
-    compiler = await tailwindcss.compile(
-      `@import "tailwindcss" prefix(${options.prefix});${
-        options.customCss ?? ""
-      }`,
-      {
-        base: "/",
-        loadStylesheet,
-      },
-    );
-  };
-
-  // Initialize the Tailwind compiler, clear the classes cache, and set up the style element
-  const initTailwindCompiler = async () => {
-    await buildCompiler();
-    classesCache.clear();
-    setTailwindStyleElement();
-  };
-
-  // Custom stylesheet loader function for Tailwind CSS assets
-  async function loadStylesheet(id: string, base: string) {
-    if (id === "tailwindcss") {
-      return { base, content: assets.css.index };
-    }
-    if (id.includes("preflight")) {
-      return { base, content: assets.css.preflight };
-    }
-    if (id.includes("theme")) {
-      return { base, content: assets.css.theme };
-    }
-    if (id.includes("utilities")) {
-      return { base, content: assets.css.utilities };
-    }
-    return { base, content: "" };
-  }
-
-  // Extract all Tailwind-related classes from the editor's HTML content
-  const getClassesFromCanvas = () => {
-    const html = editor.getHtml();
-    const tempDiv = document.createElement("div");
-    tempDiv.innerHTML = html;
-    const currentClasses = new Set<string>();
-
-    // Iterate through all elements with a class attribute
-    for (const element of tempDiv.querySelectorAll("[class]")) {
-      for (const c of element.classList) {
-        // keep only classes with tailwind prefix
-        if (c.includes(options.prefix)) currentClasses.add(c);
-      }
-    }
-    return currentClasses;
-  };
-
   // Build and update the Tailwind CSS based on the current classes in the editor
-  const buildTailwindCss = async () => {
-    try {
-      if (!compiler) await initTailwindCompiler();
-
-      let shouldRebuildCss = false;
-
-      // Get all current tailwind related classes
-      const currentClasses = getClassesFromCanvas();
-
-      // Identify classes that have been removed
-      const classToRemove: string[] = [];
-      for (const c of classesCache) {
-        if (!currentClasses.has(c)) {
-          classToRemove.push(c);
-          shouldRebuildCss = true;
-        }
-      }
-      if (classToRemove.length) {
-        for (const c of classToRemove) {
-          classesCache.delete(c);
-        }
-        // Rebuild the compiler to purge Tailwind's internal cache
-        await buildCompiler();
-      }
-
-      // Identify new classes to add
-      for (const c of currentClasses) {
-        if (!classesCache.has(c)) {
-          classesCache.add(c);
-          shouldRebuildCss = true;
-        }
-      }
-
-      // Exit early if no changes were detected
-      if (!shouldRebuildCss) return;
-
-      // Build Tailwind CSS if there are classes in the cache
-      let tailwindCss = "";
-      if (classesCache.size) {
-        tailwindCss += await compiler.build(Array.from(classesCache));
-      }
-      if (tailwindStyle !== undefined) tailwindStyle.textContent = tailwindCss;
-    } catch (error) {
-      console.error("Error building Tailwind CSS:", error);
-    }
-    return;
+  const runWorker = (html: string, notify = false) => {
+    const payload: WorkerMessageData = {
+      html,
+      prefix: options.prefix,
+      customCss: options.customCss,
+      notify,
+    };
+    worker.postMessage(payload);
   };
 
   // Build the Tailwind CSS on initial HTML load
-  editor.on("load", buildTailwindCss);
+  editor.on("load", async () => {
+    // On load we need to set up the tailwind style element where we append the compiled tailwind css
+    setTailwindStyleElement();
+    runWorker(editor.getHtml());
+  });
+
+  // Fired by grapesjs-preset-webpage on import close
+  editor.on("command:stop:gjs-open-import-webpage", () =>
+    runWorker(editor.getHtml())
+  );
 
   // If autobuild option is true, listen to the editor's update events to trigger Tailwind CSS rebuilds.
   if (options.autobuild) {
     // Listen to the editor's update events to trigger Tailwind CSS rebuilds
-    editor.on("update", buildTailwindCss);
+    editor.on("component:update:classes", (cmp: Component) =>
+      runWorker(cmp.toHTML())
+    );
   }
 
   // Register a new command "build-tailwind" that can be triggered programmatically.
   editor.Commands.add("build-tailwind", {
     run(_, sender) {
-      buildTailwindCss().then(() => {
-        if (sender.id === "build-tailwind-button") {
-          options.notificationCallback();
-        }
-      });
+      runWorker(editor.getHtml(), sender.id === "build-tailwind-button");
     },
   });
 
