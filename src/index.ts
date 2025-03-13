@@ -13,12 +13,11 @@ export type TailwindPluginOptions = {
   prefix?: string;
   /**
    * If true, the plugin will automatically rebuild the Tailwind CSS on each update.
-   * Set to false to disable auto-building and trigger builds manually.
    * @default true
    */
   autobuild?: boolean;
   /**
-   * This option allows you to append your own Tailwind CSS code immediately after the "@import 'tailwindcss';" statement.
+   * This option allows you to append your own CSS code immediately after the "@import 'tailwindcss';" statement.
    * This means you can add any custom directives, such as "@layer components { ... }" or even "@theme { ... }"
    * to further extend or override the default styles.
    *
@@ -28,8 +27,7 @@ export type TailwindPluginOptions = {
    */
   customCss?: string;
   /**
-   * Option to add a build button to the toolbar.
-   * When set to true, a button will be added that allows manual triggering of the Tailwind CSS build process.
+   * Option to add a build button to the toolbar that allows manual triggering of the Tailwind CSS build process.
    * @default false
    */
   buildButton?: boolean;
@@ -70,10 +68,10 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
   /** Reference to the <style> element where generated Tailwind CSS is injected */
   let tailwindStyle: HTMLStyleElement | undefined;
 
-  // Cache to store processed Tailwind classes to avoid unnecessary recompilation
+  /** Cache to store processed Tailwind classes to avoid unnecessary recompilation */
   const classesCache = new Set<string>();
 
-  // Build the Tailwind CSS compiler using tailwindcss.compile with a custom stylesheet loader
+  /** Build the Tailwind CSS compiler using tailwindcss.compile with a custom stylesheet loader */
   const buildCompiler = async () => {
     compiler = await tailwindcss.compile(
       `@import "tailwindcss" prefix(${options.prefix});${
@@ -86,14 +84,14 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
     );
   };
 
-  // Override the editor's getCss method to append the generated Tailwind CSS
+  /** Override the editor's getCss method to append the generated Tailwind CSS */
   const originalGetCss = editor.getCss.bind(editor);
   editor.getCss = () => {
     const originalCss = originalGetCss();
     return `${originalCss}\n${tailwindStyle?.textContent ?? ""}`;
   };
 
-  // Custom stylesheet loader function for Tailwind CSS assets
+  /** Custom stylesheet loader function for Tailwind CSS assets */
   async function loadStylesheet(id: string, base: string) {
     if (id === "tailwindcss") {
       return { base, content: assets.css.index };
@@ -110,13 +108,13 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
     return { base, content: "" };
   }
 
-  // Initialize the Tailwind compiler, clear the classes cache, and set up the style element
+  /** Initialize the Tailwind compiler, clear the classes cache, and set up the style element */
   const initTailwindCompiler = async () => {
     await buildCompiler();
     classesCache.clear();
   };
 
-  // Extract all Tailwind-related classes from the editor's HTML content
+  /** Extract all Tailwind-related classes from the editor's HTML content */
   const getClassesFromHtml = (html: string) => {
     const classRegex = /class=["']([^"']+)["']/g;
     const currentClasses = new Set<string>();
@@ -178,18 +176,14 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
     return "";
   };
 
-  const setTailwindStyleElement = () => {
-    const iframe = editor.Canvas.getDocument();
-    const wrapper = iframe.querySelector(
-      '[data-gjs-type="wrapper"]',
-    ) as HTMLDivElement;
-    if (wrapper) {
-      tailwindStyle = iframe.getElementById(STYLE_ID) as HTMLStyleElement;
-      if (!tailwindStyle) {
-        tailwindStyle = document.createElement("style");
-        tailwindStyle.setAttribute("id", STYLE_ID);
-        wrapper.appendChild(tailwindStyle);
-      }
+  const setTailwindStyleElement = (window: Window) => {
+    tailwindStyle = window.document.getElementById(
+      STYLE_ID,
+    ) as HTMLStyleElement;
+    if (!tailwindStyle) {
+      tailwindStyle = document.createElement("style");
+      tailwindStyle.setAttribute("id", STYLE_ID);
+      window.document.body.appendChild(tailwindStyle);
     }
   };
 
@@ -224,36 +218,42 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
     } catch (error: any) {}
   };
 
-  // Build the Tailwind CSS on initial HTML load
-  editor.on("load", async () => {
-    // On load we need to set up the tailwind style element where we append the compiled tailwind css
-    setTailwindStyleElement();
+  /**
+   * On iframe load (a.k.a on Page Changes) we need to set up the tailwind style element
+   * where we append the compiled tailwind css
+   */
+  editor.on("canvas:frame:load:body", ({ window }) => {
+    setTailwindStyleElement(window);
     buildTailwindCss(editor.getHtml());
   });
 
-  // Fired by grapesjs-preset-webpage on import close
+  /** Fired by grapesjs-preset-webpage on import close */
   editor.on("command:stop:gjs-open-import-webpage", () =>
     buildTailwindCss(editor.getHtml()),
   );
 
-  // If autobuild option is true, listen to the editor's update events to trigger Tailwind CSS rebuilds.
+  /**
+   * If autobuild option is true, listen to the editor's update events to
+   * trigger Tailwind CSS rebuilds.
+   */
   if (options.autobuild) {
-    // Listen to the editor's update events to trigger Tailwind CSS rebuilds
     editor.on("component:update:classes", () =>
       buildTailwindCss(editor.getHtml()),
     );
   }
 
-  // Register a new command "build-tailwind" that can be triggered programmatically.
+  /** Register a new command "build-tailwind" that can be triggered programmatically. */
   editor.Commands.add("build-tailwind", {
     run(_, sender) {
       buildTailwindCss(editor.getHtml(), sender.id === "build-tailwind-button");
     },
   });
 
+  /**
+   * Add a button to the toolbar to trigger the "build-tailwind" command,
+   * to allow manual builds when autobuild is disabled.
+   */
   if (options.buildButton) {
-    // Add a button to the toolbar to trigger the "build-tailwind" command.
-    // This button will always be visible, allowing manual builds when autobuild is disabled.
     editor.Panels.addButton(options.toolbarPanel, {
       id: "build-tailwind-button",
       command: "build-tailwind",
