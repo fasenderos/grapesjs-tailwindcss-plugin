@@ -7,6 +7,7 @@ The **GrapesJS TailwindCSS Plugin** seamlessly integrates Tailwind CSS 4 with Gr
 - **Tailwind CSS 4 Integration:** Utilize the latest version of Tailwind CSS.
 - **Dynamic CSS Build:** Automatically compiles Tailwind CSS based on your project's classes.
 - **Export Ready:** The compiled CSS is appended to your export, ensuring consistency.
+- **Multi Page Support:** The plugin makes use of the [PageManager](https://grapesjs.com/docs/modules/Pages.html)
 
 [DEMO](https://codesandbox.io/p/sandbox/grapesjs-tailwindcss-4-plugin-demo-d24p68)
 
