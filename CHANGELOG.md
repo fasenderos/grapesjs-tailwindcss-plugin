@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.5](https://github.com/fasenderos/grapesjs-tailwindcss-plugin/compare/v0.1.4...v0.1.5) (2025-03-13)
+
+### Features
+
+* add support for page manager ([00a8813](https://github.com/fasenderos/grapesjs-tailwindcss-plugin/commit/00a8813d648cc27627fe5743d895bfda79c37449))
+
 ## [0.1.4](https://github.com/fasenderos/grapesjs-tailwindcss-plugin/compare/v0.1.3...v0.1.4) (2025-03-10)
 
 ### Bug Fixes
