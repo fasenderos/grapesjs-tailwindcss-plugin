@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.6](https://github.com/fasenderos/grapesjs-tailwindcss-plugin/compare/v0.1.5...v0.1.6) (2025-03-23)
+
+### Features
+
+* now prefix can be null ([56fed3f](https://github.com/fasenderos/grapesjs-tailwindcss-plugin/commit/56fed3f40e1d644409043f2b183cf57c3c53f3fa))
+
 ## [0.1.5](https://github.com/fasenderos/grapesjs-tailwindcss-plugin/compare/v0.1.4...v0.1.5) (2025-03-13)
 
 ### Features
