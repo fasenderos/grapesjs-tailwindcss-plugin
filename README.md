@@ -96,7 +96,7 @@ const editor = grapesjs.init({
 
 | Option                 | Description                                                                                                                                                             | Default      |
 | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
-| `prefix`               | Prefix to use for Tailwind CSS classes. Helps differentiate Tailwind classes from others.                                                                               | `tw`         |
+| `prefix`               | Prefix to use for Tailwind CSS classes. Helps differentiate Tailwind classes from others.                                                                               | `null`         |
 | `autobuild`            | If `true`, the plugin automatically rebuilds Tailwind CSS on each update. Set to false for manual builds.                                                               | `true`       |
 | `customCss`            | A custom css that will be appended immediately after the `@import 'tailwindcss';` statement. [See the tailwind docs for more info](https://tailwindcss.com/docs/theme). | `""`         |
 | `buildButton`          | Option to add a manual build button to the toolbar for triggering the CSS build process.                                                                                | `false`      |

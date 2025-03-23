@@ -8,9 +8,9 @@ export type TailwindPluginOptions = {
   /**
    * The prefix to use for Tailwind CSS classes.
    * This helps differentiate Tailwind classes from other CSS classes.
-   * @default "tw"
+   * @default null
    */
-  prefix?: string;
+  prefix?: string | null;
   /**
    * If true, the plugin will automatically rebuild the Tailwind CSS on each update.
    * @default true
@@ -53,7 +53,7 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
       autobuild: true,
       buildButton: false,
       customCss: "",
-      prefix: "tw",
+      prefix: null,
       toolbarPanel: "options",
       notificationCallback: () => {},
     },
@@ -74,9 +74,9 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
   /** Build the Tailwind CSS compiler using tailwindcss.compile with a custom stylesheet loader */
   const buildCompiler = async () => {
     compiler = await tailwindcss.compile(
-      `@import "tailwindcss" prefix(${options.prefix});${
-        options.customCss ?? ""
-      }`,
+      `@import "tailwindcss"${
+        options.prefix?.length ? ` prefix(${options.prefix})` : ""
+      };${options.customCss ?? ""}`,
       {
         base: "/",
         loadStylesheet,
@@ -125,9 +125,11 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
     while ((match = classRegex.exec(html)) !== null) {
       const classes = match[1].split(" ");
       for (const cls of classes) {
-        if (cls.startsWith(options.prefix)) {
-          currentClasses.add(cls);
-        }
+        if (options.prefix?.length) {
+          if (cls.startsWith(options.prefix)) {
+            currentClasses.add(cls);
+          }
+        } else currentClasses.add(cls);
       }
     }
     return currentClasses;
@@ -135,12 +137,10 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
 
   const processRemovedClasses = async (currentClasses: Set<string>) => {
     // Identify classes that have been removed
-    let changed = false;
     const classesToRemove: string[] = [];
     for (const cls of classesCache) {
       if (!currentClasses.has(cls)) {
         classesToRemove.push(cls);
-        changed = true;
       }
     }
 
@@ -153,19 +153,18 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
       await buildCompiler();
     }
 
-    return changed;
+    return classesToRemove.length > 0; // Means it's changed
   };
 
   const processAddedClasses = (currentClasses: Set<string>): boolean => {
     // Identify new classes to add by checking if they are in cache
-    let changed = false;
+    const originalSize = classesCache.size;
     for (const c of currentClasses) {
       if (!classesCache.has(c)) {
         classesCache.add(c);
-        changed = true;
       }
     }
-    return changed;
+    return originalSize !== classesCache.size; // Means it's changed
   };
 
   const compileTailwindCss = async () => {
