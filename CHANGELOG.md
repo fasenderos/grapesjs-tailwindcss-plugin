@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.7](https://github.com/fasenderos/grapesjs-tailwindcss-plugin/compare/v0.1.6...v0.1.7) (2025-03-23)
+
+### Features
+
+* load customCss from url ([b9d24f8](https://github.com/fasenderos/grapesjs-tailwindcss-plugin/commit/b9d24f8b5e6571a06e434b4e53d5acd001c28e4d))
+
 ## [0.1.6](https://github.com/fasenderos/grapesjs-tailwindcss-plugin/compare/v0.1.5...v0.1.6) (2025-03-23)
 
 ### Features
