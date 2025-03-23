@@ -44,6 +44,38 @@ export type TailwindPluginOptions = {
   notificationCallback?: () => void;
 };
 
+/**
+ * Retrieves CSS content from a URL or returns the string as is.
+ * @param {string} input - The CSS URL or raw CSS string.
+ * @returns {Promise<string>} The CSS content.
+ */
+async function getCustomCSSContent(
+  input?: string,
+): Promise<string | undefined> {
+  if (!input) return;
+  try {
+    // Try creating a URL object to check if it's a valid URL
+    const url = new URL(input);
+
+    // Ensure the URL uses HTTP or HTTPS
+    if (url.protocol === "http:" || url.protocol === "https:") {
+      // Fetch the CSS content from the URL
+      const response = await fetch(input);
+
+      // Check if the request was successful
+      if (!response.ok) {
+        throw new Error(`Failed to load CSS: ${response.statusText}`);
+      }
+
+      // Return the CSS content as text
+      return await response.text();
+    }
+  } catch {
+    // If input is not a valid URL, return it as is
+    return input;
+  }
+}
+
 export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
   // Merge default options with user-provided options
   const options: Required<TailwindPluginOptions> = {
@@ -73,10 +105,11 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
 
   /** Build the Tailwind CSS compiler using tailwindcss.compile with a custom stylesheet loader */
   const buildCompiler = async () => {
+    const customCss = await getCustomCSSContent(options.customCss);
     compiler = await tailwindcss.compile(
       `@import "tailwindcss"${
         options.prefix?.length ? ` prefix(${options.prefix})` : ""
-      };${options.customCss ?? ""}`,
+      };${customCss ?? ""}`,
       {
         base: "/",
         loadStylesheet,
