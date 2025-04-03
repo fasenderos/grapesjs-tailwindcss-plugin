@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.8](https://github.com/fasenderos/grapesjs-tailwindcss-plugin/compare/v0.1.7...v0.1.8) (2025-04-03)
+
+### Features
+
+* add autocomplete support for tw classes ([fcc4ae6](https://github.com/fasenderos/grapesjs-tailwindcss-plugin/commit/fcc4ae6b1bb4a061f20110308cc17c7feb151fcc))
+
 ## [0.1.7](https://github.com/fasenderos/grapesjs-tailwindcss-plugin/compare/v0.1.6...v0.1.7) (2025-03-23)
 
 ### Features
