@@ -1,4 +1,6 @@
 // @ts-ignore
+import autoComplete from "@tarekraafat/autocomplete.js";
+// @ts-ignore
 import * as tailwindcss from "tailwindcss";
 import * as assets from "./assets";
 
@@ -141,7 +143,7 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
     return { base, content: "" };
   }
 
-  /** Initialize the Tailwind compiler, clear the classes cache, and set up the style element */
+  /** Initialize the Tailwind compiler and clear the classes cache */
   const initTailwindCompiler = async () => {
     await buildCompiler();
     classesCache.clear();
@@ -152,9 +154,8 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
     const classRegex = /class=["']([^"']+)["']/g;
     const currentClasses = new Set<string>();
 
-    // biome-ignore lint/suspicious/noImplicitAnyLet: <explanation>
-    let match;
-    // biome-ignore lint/suspicious/noAssignInExpressions: <explanation>
+    let match: RegExpExecArray | null;
+    // biome-ignore lint/suspicious/noAssignInExpressions:
     while ((match = classRegex.exec(html)) !== null) {
       const classes = match[1].split(" ");
       for (const cls of classes) {
@@ -177,7 +178,7 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
       }
     }
 
-    // Remove classes non more used
+    // Remove classes no more used
     if (classesToRemove.length) {
       for (const c of classesToRemove) {
         classesCache.delete(c);
@@ -226,11 +227,10 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
     try {
       // Get all current tailwind related classes
       const currentClasses = getClassesFromHtml(html);
-
       // Identify classes that have been removed
       const classesRemoved = await processRemovedClasses(currentClasses);
 
-      // Identify new classes to add
+      // Identify classes that have been added
       const classesAdded = processAddedClasses(currentClasses);
 
       const shouldRebuildCss = classesRemoved || classesAdded;
@@ -245,9 +245,7 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
       if (notify) {
         options.notificationCallback();
       }
-
-      // biome-ignore lint/suspicious/noExplicitAny: unknown
-    } catch (error: any) {}
+    } catch (error: unknown) {}
   };
 
   /**
@@ -257,6 +255,78 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
   editor.on("canvas:frame:load:body", ({ window }) => {
     setTailwindStyleElement(window);
     buildTailwindCss(editor.getHtml());
+  });
+
+  /**
+   * Initializes the autocomplete feature when the editor is fully loaded.
+   * Provides class name suggestions based on existing and default classes,
+   * filtering already applied classes.
+   */
+
+  editor.on("load", () => {
+    const container = editor.getContainer();
+    const pfx = editor.SelectorManager.getConfig("pStylePrefix");
+    const style = document.createElement("style");
+    style.textContent = assets.css.autoCompleteCSS;
+    container?.appendChild(style);
+
+    const defaultTwClasses = new Set(assets.css.defaultTwClasses);
+    const baseClasses = new Set([...classesCache, ...defaultTwClasses]);
+
+    const autoCompleteJS = new autoComplete({
+      selector: `#${pfx}clm-new`,
+      data: {
+        src: () => {
+          const currentClasses = editor.SelectorManager.selected
+            .getStyleable()
+            .map((selector) => selector.getName());
+
+          const filteredClasses = new Set(baseClasses);
+
+          for (const cls of currentClasses) {
+            filteredClasses.delete(cls);
+          }
+
+          return Array.from(filteredClasses).sort();
+        },
+      },
+      trigger: () => true,
+      events: {
+        input: {
+          focus: () => {
+            autoCompleteJS.start("");
+          },
+        },
+      },
+      resultsList: {
+        // biome-ignore lint/suspicious/noExplicitAny: autoComplete.js does not have types
+        element: (list: HTMLUListElement, data: any) => {
+          const info = document.createElement("p");
+          if (data.results.length > 0) {
+            info.innerHTML = `Showing <strong>${data.results.length}</strong> of <strong>${data.matches.length}</strong> results`;
+          } else {
+            info.innerHTML = `Found <strong>${data.matches.length}</strong> matching results for <strong>"${data.query}"</strong>`;
+          }
+          list.prepend(info);
+        },
+        noResults: true,
+        maxResults: Number.MAX_SAFE_INTEGER,
+        tabSelect: true,
+      },
+      resultItem: { highlight: true },
+      debounce: 200, // delay time duration that counts after typing is done for autoComplete.js engine to start
+      threshold: 1, // minimum characters length where autoComplete.js engine starts
+    });
+
+    // biome-ignore lint/suspicious/noExplicitAny: autoComplete.js does not have types
+    autoCompleteJS.input.addEventListener("selection", (event: any) => {
+      const selection = event.detail?.selection?.value;
+      autoCompleteJS.input.blur();
+      if (selection)
+        editor.SelectorManager.addSelected(
+          `${options.prefix?.length ? `${options.prefix}:` : ""}${selection}`,
+        );
+    });
   });
 
   /** Fired by grapesjs-preset-webpage on import close */

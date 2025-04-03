@@ -19,6 +19,7 @@
     "test:cov": "c8 --reporter=lcov node --import=tsx --import=./test/setup.ts --test ./test/*.test.ts"
   },
   "dependencies": {
+    "@tarekraafat/autocomplete.js": "^10.2.9",
     "tailwindcss": "^4.0.12"
   },
   "devDependencies": {
