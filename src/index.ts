@@ -271,7 +271,7 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
     container?.appendChild(style);
 
     const defaultTwClasses = new Set(assets.css.defaultTwClasses);
-    const baseClasses = new Set([...classesCache, ...defaultTwClasses]);
+    const baseClasses = new Set([...defaultTwClasses, ...classesCache]);
 
     const autoCompleteJS = new autoComplete({
       selector: `#${pfx}clm-new`,
@@ -287,7 +287,7 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
             filteredClasses.delete(cls);
           }
 
-          return Array.from(filteredClasses).sort();
+          return filteredClasses;
         },
       },
       trigger: () => true,
