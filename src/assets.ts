@@ -87,7 +87,7 @@ const floatCls = [
   ...createClasses("float", ["right", "left", "start", "end", "none"]),
 ];
 const clearCls = [
-  ...createClasses("float", ["left", "right", "both", "start", "end", "none"]),
+  ...createClasses("clear", ["left", "right", "both", "start", "end", "none"]),
 ];
 const isolateCls = ["isolate", "isolate-auto"];
 const objectFitCls = [
