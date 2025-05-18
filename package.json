@@ -1,6 +1,6 @@
 {
   "name": "grapesjs-tailwindcss-plugin",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "A powerful GrapesJS plugin that integrates Tailwind CSS 4 for modern styling and rapid development",
   "main": "dist/index.js",
   "repository": {

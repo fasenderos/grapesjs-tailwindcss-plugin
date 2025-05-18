@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.1.9](https://github.com/fasenderos/grapesjs-tailwindcss-plugin/compare/v0.1.8...v0.1.9) (2025-05-18)
+
+### Features
+
+* add more zindex classes ([42ced60](https://github.com/fasenderos/grapesjs-tailwindcss-plugin/commit/42ced605897d380791e7160a06bedf9d2748e372))
+
+### Bug Fixes
+
+* clear classes wrong prefix ([2503b70](https://github.com/fasenderos/grapesjs-tailwindcss-plugin/commit/2503b70fae519cd44230e62a03cbf13cdfebcb2d))
+
 ## [0.1.8](https://github.com/fasenderos/grapesjs-tailwindcss-plugin/compare/v0.1.7...v0.1.8) (2025-04-03)
 
 ### Features
