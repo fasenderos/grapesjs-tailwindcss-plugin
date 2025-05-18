@@ -117,7 +117,7 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
    * @returns {Promise<string>} The CSS content.
    */
   async function getCustomCSSContent(
-    input?: string
+    input?: string,
   ): Promise<string | undefined> {
     if (!input) return;
     try {
@@ -207,7 +207,7 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
     const newClasses = new Set<string>();
 
     for (const element of editor.Canvas.getDocument().querySelectorAll(
-      "[class]"
+      "[class]",
     )) {
       for (const c of element.classList) {
         if (classes.has(c)) continue;
@@ -244,7 +244,7 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
         }
       })
       .catch((err) =>
-        console.error("Failed to build", (err as Error).message ?? err)
+        console.error("Failed to build", (err as Error).message ?? err),
       );
   }
 
@@ -392,7 +392,7 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
       autoCompleteJS.input.blur();
       if (selection)
         editor.SelectorManager.addSelected(
-          `${options.prefix?.length ? `${options.prefix}:` : ""}${selection}`
+          `${options.prefix?.length ? `${options.prefix}:` : ""}${selection}`,
         );
     });
   });

@@ -43,7 +43,7 @@ const columnCls = [
 const breakCls = [
   ...createClasses(
     ["break-after", "break-before"],
-    ["auto", "avoid", "all", "avoid-page", "page", "left", "right", "column"]
+    ["auto", "avoid", "all", "avoid-page", "page", "left", "right", "column"],
   ),
   ...createClasses("break-inside", [
     "auto",
@@ -115,13 +115,13 @@ const objectPositionCls = [
 const overflowCls = [
   ...createClasses(
     ["overflow", "overflow-x", "overflow-y"],
-    ["auto", "hidden", "clip", "visible", "scroll"]
+    ["auto", "hidden", "clip", "visible", "scroll"],
   ),
 ];
 const overscrollCls = [
   ...createClasses(
     ["overscroll", "overscroll-x", "overscroll-y"],
-    ["auto", "contain", "none"]
+    ["auto", "contain", "none"],
   ),
 ];
 const positionCls = ["static", "fixed", "absolute", "relative", "sticky"];
@@ -147,7 +147,7 @@ const insetCls = [
       "left",
       "-left",
     ],
-    ["px", "full"]
+    ["px", "full"],
   ),
   ...createClasses(
     [
@@ -161,7 +161,7 @@ const insetCls = [
       "right",
       "left",
     ],
-    ["auto"]
+    ["auto"],
   ),
 ];
 const visibilityCls = ["visible", "invisible", "collapse"];
@@ -226,7 +226,7 @@ const colsCls = [
       "col-end",
       "-col-end",
     ],
-    numbers
+    numbers,
   ),
   "col-span-full",
   "col-start-auto",
@@ -247,7 +247,7 @@ const rowsCls = [
       "row-end",
       "-row-end",
     ],
-    numbers
+    numbers,
   ),
   "row-span-full",
   "row-start-auto",
@@ -351,13 +351,13 @@ const placeContentSelfCls = [
 const paddingCls = [
   ...createClasses(
     ["p", "px", "py", "ps", "pe", "pt", "pb", "pr", "pl"],
-    ["px", ...numbers]
+    ["px", ...numbers],
   ),
 ];
 const marginCls = [
   ...createClasses(
     ["m", "mx", "my", "ms", "me", "mt", "mb", "mr", "ml"],
-    ["px", "auto", ...numbers]
+    ["px", "auto", ...numbers],
   ),
   ...createClasses(["space-x", "space-y"], ["px", "reverse", ...numbers]),
 ];
@@ -378,7 +378,7 @@ const sizingCls = [
       "max",
       "fit",
       ...numbers,
-    ]
+    ],
   ),
   ...createClasses(
     ["w", "min-w", "max-w", "h", "min-h", "max-h"],
@@ -397,7 +397,7 @@ const sizingCls = [
       "5xl",
       "6xl",
       "7xl",
-    ]
+    ],
   ),
 ];
 
