@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.10](https://github.com/fasenderos/grapesjs-tailwindcss-plugin/compare/v0.1.9...v0.1.10) (2025-07-25)
+
+### Features
+
+* enable/disbable autoCompleteJs ([edf657f](https://github.com/fasenderos/grapesjs-tailwindcss-plugin/commit/edf657f4cdc13f548708194e08c178ac9d9f171a))
+
 ## [0.1.9](https://github.com/fasenderos/grapesjs-tailwindcss-plugin/compare/v0.1.8...v0.1.9) (2025-05-18)
 
 ### Features
