@@ -66,7 +66,7 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
       customCss: "",
       prefix: null,
       toolbarPanel: "options",
-      notificationCallback: () => { },
+      notificationCallback: () => {},
     },
     ...opts,
   };
@@ -125,7 +125,7 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
    * @param {string} input - The CSS URL or raw CSS string.
    * @returns {Promise<string>} The CSS content.
    */
-  async function getCustomCSSContent (
+  async function getCustomCSSContent(
     input?: string,
   ): Promise<string | undefined> {
     if (!input) return;
@@ -160,10 +160,11 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
    * This does **not** imply that the CSS is actually built. That happens in the
    * `build` function and is a separate scheduled task.
    */
-  async function createCompiler () {
+  async function createCompiler() {
     const customCss = await getCustomCSSContent(options.customCss);
-    const css = `@import "tailwindcss"${options.prefix?.length ? ` prefix(${options.prefix})` : ""
-      };${customCss ?? ""}`;
+    const css = `@import "tailwindcss"${
+      options.prefix?.length ? ` prefix(${options.prefix})` : ""
+    };${customCss ?? ""}`;
 
     // The input CSS did not change so the compiler does not need to be recreated
     if (lastCss === css) return;
@@ -182,8 +183,8 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
     classes.clear();
   }
 
-  async function loadStylesheet (id: string, base: string) {
-    function load () {
+  async function loadStylesheet(id: string, base: string) {
+    function load() {
       if (id === "tailwindcss") {
         return { base, content: assets.css.index };
       }
@@ -208,7 +209,7 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
     }
   }
 
-  async function build (kind: "full" | "incremental") {
+  async function build(kind: "full" | "incremental") {
     if (!compiler) return;
 
     // 1. Refresh the known list of classes
@@ -230,8 +231,8 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
     tailwindStyle.textContent = compiler.build(Array.from(newClasses));
   }
 
-  function rebuild (kind: "full" | "incremental", notify = false) {
-    async function run () {
+  function rebuild(kind: "full" | "incremental", notify = false) {
+    async function run() {
       if (!compiler && kind !== "full") {
         return;
       }
@@ -261,7 +262,7 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
     rebuild("full");
   });
 
-  function observeSheet (sheet: HTMLStyleElement) {
+  function observeSheet(sheet: HTMLStyleElement) {
     styleObserver.observe(sheet, {
       attributes: true,
       attributeFilter: ["type"],
@@ -351,7 +352,10 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
       const baseClasses = new Set([...defaultTwClasses, ...classes]);
 
       const autoCompleteJS = new autoComplete({
-        selector: typeof options.autocomplete === 'string' ? options.autocomplete : `#${pfx}clm-new`,
+        selector:
+          typeof options.autocomplete === "string"
+            ? options.autocomplete
+            : `#${pfx}clm-new`,
         data: {
           src: () => {
             const currentClasses = editor.SelectorManager.selected
@@ -412,7 +416,7 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
 
   /** Register a new command "build-tailwind" that can be triggered programmatically. */
   editor.Commands.add("build-tailwind", {
-    run (_, sender) {
+    run(_, sender) {
       rebuild("full", sender.id === "build-tailwind-button");
     },
   });
