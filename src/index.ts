@@ -19,6 +19,14 @@ export type TailwindPluginOptions = {
    */
   autobuild?: boolean;
   /**
+   * Controls the behavior of the autocomplete feature that provides Tailwind class name suggestions.
+   *
+   * - If set to `false`, autocomplete is disabled.
+   * - If set to `true` (default), autocomplete is enabled and will use the default selector `#gjs-clm-new`.
+   * - If set to a `string`, that string will be used as a custom selector for the autocomplete.
+   */
+  autocomplete?: boolean | string;
+  /**
    * This option allows you to append your own CSS code immediately after the "@import 'tailwindcss';" statement.
    * This means you can add any custom directives, such as "@layer components { ... }" or even "@theme { ... }"
    * to further extend or override the default styles.
@@ -53,11 +61,12 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
       i18n: {},
       // default options
       autobuild: true,
+      autocomplete: true,
       buildButton: false,
       customCss: "",
       prefix: null,
       toolbarPanel: "options",
-      notificationCallback: () => {},
+      notificationCallback: () => { },
     },
     ...opts,
   };
@@ -116,7 +125,7 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
    * @param {string} input - The CSS URL or raw CSS string.
    * @returns {Promise<string>} The CSS content.
    */
-  async function getCustomCSSContent(
+  async function getCustomCSSContent (
     input?: string,
   ): Promise<string | undefined> {
     if (!input) return;
@@ -151,11 +160,10 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
    * This does **not** imply that the CSS is actually built. That happens in the
    * `build` function and is a separate scheduled task.
    */
-  async function createCompiler() {
+  async function createCompiler () {
     const customCss = await getCustomCSSContent(options.customCss);
-    const css = `@import "tailwindcss"${
-      options.prefix?.length ? ` prefix(${options.prefix})` : ""
-    };${customCss ?? ""}`;
+    const css = `@import "tailwindcss"${options.prefix?.length ? ` prefix(${options.prefix})` : ""
+      };${customCss ?? ""}`;
 
     // The input CSS did not change so the compiler does not need to be recreated
     if (lastCss === css) return;
@@ -174,8 +182,8 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
     classes.clear();
   }
 
-  async function loadStylesheet(id: string, base: string) {
-    function load() {
+  async function loadStylesheet (id: string, base: string) {
+    function load () {
       if (id === "tailwindcss") {
         return { base, content: assets.css.index };
       }
@@ -200,7 +208,7 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
     }
   }
 
-  async function build(kind: "full" | "incremental") {
+  async function build (kind: "full" | "incremental") {
     if (!compiler) return;
 
     // 1. Refresh the known list of classes
@@ -222,8 +230,8 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
     tailwindStyle.textContent = compiler.build(Array.from(newClasses));
   }
 
-  function rebuild(kind: "full" | "incremental", notify = false) {
-    async function run() {
+  function rebuild (kind: "full" | "incremental", notify = false) {
+    async function run () {
       if (!compiler && kind !== "full") {
         return;
       }
@@ -253,7 +261,7 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
     rebuild("full");
   });
 
-  function observeSheet(sheet: HTMLStyleElement) {
+  function observeSheet (sheet: HTMLStyleElement) {
     styleObserver.observe(sheet, {
       attributes: true,
       attributeFilter: ["type"],
@@ -326,83 +334,85 @@ export default (editor: Editor, opts: TailwindPluginOptions = {}) => {
     }
   });
 
-  /**
-   * Initializes the autocomplete feature when the editor is fully loaded.
-   * Provides class name suggestions based on existing and default classes,
-   * filtering already applied classes.
-   */
-  editor.on("load", () => {
-    const container = editor.getContainer();
-    const pfx = editor.SelectorManager.getConfig("pStylePrefix");
-    const style = document.createElement("style");
-    style.textContent = assets.css.autoCompleteCSS;
-    container?.appendChild(style);
+  if (options.autocomplete) {
+    /**
+     * Initializes the autocomplete feature when the editor is fully loaded.
+     * Provides class name suggestions based on existing and default classes,
+     * filtering already applied classes.
+     */
+    editor.on("load", () => {
+      const container = editor.getContainer();
+      const pfx = editor.SelectorManager.getConfig("pStylePrefix");
+      const style = document.createElement("style");
+      style.textContent = assets.css.autoCompleteCSS;
+      container?.appendChild(style);
 
-    const defaultTwClasses = new Set(assets.css.defaultTwClasses);
-    const baseClasses = new Set([...defaultTwClasses, ...classes]);
+      const defaultTwClasses = new Set(assets.css.defaultTwClasses);
+      const baseClasses = new Set([...defaultTwClasses, ...classes]);
 
-    const autoCompleteJS = new autoComplete({
-      selector: `#${pfx}clm-new`,
-      data: {
-        src: () => {
-          const currentClasses = editor.SelectorManager.selected
-            .getStyleable()
-            .map((selector) => selector.getName());
+      const autoCompleteJS = new autoComplete({
+        selector: typeof options.autocomplete === 'string' ? options.autocomplete : `#${pfx}clm-new`,
+        data: {
+          src: () => {
+            const currentClasses = editor.SelectorManager.selected
+              .getStyleable()
+              .map((selector) => selector.getName());
 
-          const filteredClasses = new Set(baseClasses);
+            const filteredClasses = new Set(baseClasses);
 
-          for (const cls of currentClasses) {
-            filteredClasses.delete(cls);
-          }
+            for (const cls of currentClasses) {
+              filteredClasses.delete(cls);
+            }
 
-          return filteredClasses;
-        },
-      },
-      trigger: () => true,
-      events: {
-        input: {
-          focus: () => {
-            autoCompleteJS.start("");
+            return filteredClasses;
           },
         },
-      },
-      resultsList: {
-        // biome-ignore lint/suspicious/noExplicitAny: autoComplete.js does not have types
-        element: (list: HTMLUListElement, data: any) => {
-          const info = document.createElement("p");
-          if (data.results.length > 0) {
-            info.innerHTML = `Showing <strong>${data.results.length}</strong> of <strong>${data.matches.length}</strong> results`;
-          } else {
-            info.innerHTML = `Found <strong>${data.matches.length}</strong> matching results for <strong>"${data.query}"</strong>`;
-          }
-          list.prepend(info);
+        trigger: () => true,
+        events: {
+          input: {
+            focus: () => {
+              autoCompleteJS.start("");
+            },
+          },
         },
-        noResults: true,
-        maxResults: Number.MAX_SAFE_INTEGER,
-        tabSelect: true,
-      },
-      resultItem: { highlight: true },
-      debounce: 200, // delay time duration that counts after typing is done for autoComplete.js engine to start
-      threshold: 1, // minimum characters length where autoComplete.js engine starts
-    });
+        resultsList: {
+          // biome-ignore lint/suspicious/noExplicitAny: autoComplete.js does not have types
+          element: (list: HTMLUListElement, data: any) => {
+            const info = document.createElement("p");
+            if (data.results.length > 0) {
+              info.innerHTML = `Showing <strong>${data.results.length}</strong> of <strong>${data.matches.length}</strong> results`;
+            } else {
+              info.innerHTML = `Found <strong>${data.matches.length}</strong> matching results for <strong>"${data.query}"</strong>`;
+            }
+            list.prepend(info);
+          },
+          noResults: true,
+          maxResults: Number.MAX_SAFE_INTEGER,
+          tabSelect: true,
+        },
+        resultItem: { highlight: true },
+        debounce: 200, // delay time duration that counts after typing is done for autoComplete.js engine to start
+        threshold: 1, // minimum characters length where autoComplete.js engine starts
+      });
 
-    // biome-ignore lint/suspicious/noExplicitAny: autoComplete.js does not have types
-    autoCompleteJS.input.addEventListener("selection", (event: any) => {
-      const selection = event.detail?.selection?.value;
-      autoCompleteJS.input.blur();
-      if (selection)
-        editor.SelectorManager.addSelected(
-          `${options.prefix?.length ? `${options.prefix}:` : ""}${selection}`,
-        );
+      // biome-ignore lint/suspicious/noExplicitAny: autoComplete.js does not have types
+      autoCompleteJS.input.addEventListener("selection", (event: any) => {
+        const selection = event.detail?.selection?.value;
+        autoCompleteJS.input.blur();
+        if (selection)
+          editor.SelectorManager.addSelected(
+            `${options.prefix?.length ? `${options.prefix}:` : ""}${selection}`,
+          );
+      });
     });
-  });
+  }
 
   /** Fired by grapesjs-preset-webpage on import close */
   editor.on("command:stop:gjs-open-import-webpage", () => rebuild("full"));
 
   /** Register a new command "build-tailwind" that can be triggered programmatically. */
   editor.Commands.add("build-tailwind", {
-    run(_, sender) {
+    run (_, sender) {
       rebuild("full", sender.id === "build-tailwind-button");
     },
   });

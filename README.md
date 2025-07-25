@@ -94,14 +94,15 @@ const editor = grapesjs.init({
 
 ## Options
 
-| Option                 | Description                                                                                                                                                             | Default      |
-| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
-| `prefix`               | Prefix to use for Tailwind CSS classes. Helps differentiate Tailwind classes from others.                                                                               | `null`         |
-| `autobuild`            | If `true`, the plugin automatically rebuilds Tailwind CSS on each update. Set to false for manual builds.                                                               | `true`       |
-| `customCss`            | The URL of a CSS file or a raw CSS string that will be appended immediately after the `@import 'tailwindcss';` statement. This allows you to extend Tailwind's styles dynamically. [See the Tailwind docs for more details](https://tailwindcss.com/docs/theme). | `""`         |
-| `buildButton`          | Option to add a manual build button to the toolbar for triggering the CSS build process.                                                                                | `false`      |
-| `toolbarPanel`         | Specify the panel where the build button should be added (e.g., `options`).                                                                                             | `options`    |
-| `notificationCallback` | A custom callback function to handle notifications when Tailwind CSS is compiled.                                                                                       | `() => void` |
+| Option | Description | Type | Default |
+| --- | --- | --- | --- |
+| `prefix` | Prefix to use for Tailwind CSS classes. Helps differentiate Tailwind classes from others. | `string` or `null` |`null` |
+| `autobuild` | If `true`, the plugin automatically rebuilds Tailwind CSS on each update. Set to false for manual builds. | `boolean` | `true` |
+| `autocomplete` | Controls the behavior of the autocomplete feature that provides Tailwind class name suggestions. If set to `false`, autocomplete is disabled. If set to `true` (default), autocomplete is enabled and will use the default selector `#gjs-clm-new`. If set to a `string`, that string will be used as a custom selector for the autocomplete. | `boolean` or `string` | `true` |
+| `customCss` | The URL of a CSS file or a raw CSS string that will be appended immediately after the `@import 'tailwindcss';` statement. This allows you to extend Tailwind's styles dynamically. [See the Tailwind docs for more details](https://tailwindcss.com/docs/theme). | `string` | `""` |
+| `buildButton` | Option to add a manual build button to the toolbar for triggering the CSS build process. | `boolean` | `false`|
+| `toolbarPanel` | Specify the panel where the build button should be added (e.g., `options`). | `string` | `options` |
+| `notificationCallback` | A custom callback function to handle notifications when Tailwind CSS is compiled. | `function` | `() => void` |
 
 ## Development
 
