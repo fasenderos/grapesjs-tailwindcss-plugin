@@ -131,6 +131,38 @@ Build the source
 $ npm run build
 ```
 
+## 🛠️ Common Errors & How to Fix Them
+Sometimes you might encounter issues when using this plugin with different GrapesJS environments.
+Here are some known errors and their solutions:
+
+`Cannot read properties of null (reading 'addEventListener')`
+
+or
+
+`TypeError: Cannot use 'in' operator to search for 'aria-controls' in null`
+
+**Cause**:
+This happens because this plugin has an autocomplete feature that tries to attach to an input field that exists in GrapesJS Editor, but not in GrapesJS Studio. Studio already provides its own autocomplete for CSS classes, so the plugin fails when it doesn’t find the expected element.
+
+**Solution**:
+Disable the plugin’s autocomplete when initializing it with GrapesJS Studio:
+
+```ts
+import tailwindPlugin from 'grapesjs-tailwindcss-plugin';
+
+createStudioEditor({
+  root: editorEl.value,
+  plugins: [
+    (editor) => tailwindPlugin(editor, { autocomplete: false })
+  ],
+});
+```
+By setting `autocomplete: false`, the plugin will skip attaching the autocomplete, avoiding the error.
+
+**💡 Found another issue?**
+
+If you run into a different problem, feel free to open an issue on GitHub and provide a minimal reproducible example.
+
 ## License
 
 Copyright [Andrea Fassina](https://github.com/fasenderos), Licensed under [MIT](LICENSE).
